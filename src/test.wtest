@@ -1,0 +1,9 @@
+import cocina.*
+import comensales.*
+
+test "testX" {
+
+	const pepe = new Vegetariano()
+	assert.throwsException({cocina.servirUnPlato(pepe)}) 	
+	assert.equals(0, pepe.platosQueComio().size())
+}
