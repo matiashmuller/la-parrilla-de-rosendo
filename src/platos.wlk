@@ -1,142 +1,54 @@
-class Plato {	
-	// no va porque para algunas subclases 
-	// es un cálculo
-	// var property peso
+class Plato {
+	var property peso = 250 // Preguntar como hicieron el peso, var o metodo?
 	
-	/*
-	 * lo tengo que dejar abstracto
-	 * para poder definir esAbundante()
-	 */
-	method peso()
-	
-	// es correcto que
-	// esAptoVegetariano y valoracion
-	// sean métodos abstractos, de hecho está muy bien.
-	// Pero también pueden no serlo.
-	
-	/*
-	 * Esto es lo único que se resuelve de 
-	 * la misma forma para todos los platos
-	 */
-	method esAbundante() {
-		return self.peso() > 250
-	}
+	method esAptoVegetariano() = false
+	method valoracion()
+	method esAbundante() = self.peso()> 250
+	method sePareceA(plato) = plato.esAptoVegetariano() == self.esAptoVegetariano()
 }
-
 
 class Provoleta inherits Plato {
-	/* poner var property es suficiente
-	 * para hacer override del método abstracto
-	 */
-	 var property peso
-	 
-	 // esta forma también vale
-//	 var peso
-//	 override method peso() { return peso }
-
 	var tieneEspecias
-	var esCompleta
+	const esCompleta
 	
-	method esAptoVegetariano() {
-		return not esCompleta
-	}	
-	
-	method valoracion() {
-		if (self.esEspecial()) {
-			return 120
-		} else {
-			return 85
-		}
-	}
-	method esEspecial() {
-		return (self.esAbundante() and tieneEspecias) or esCompleta 
-	}
+	override method esAptoVegetariano() = !esCompleta
+	override method valoracion() = if(self.esEspecial()) 120 else 85
+	method esEspecial() = self.esAbundante() && tieneEspecias || esCompleta
 }
 
-
-/*
- * es incorrecto que sea un object,
- * tengo que poder definir distintas hamburguesas
- * porque pueden tener distinto pan
- */
-class HamburguesaDeCarne inherits Plato {
-	const property peso = 250
+class HamburCarne inherits Plato {
+	var pan
 	
-	var property pan
-	
-	// esto también vale
-//	override method peso() = 250
-
-	method esAptoVegetariano() = false
-
-	method valoracion() {
-		return 60 + pan.valoracion()
-	}
+	method configurarPan(unPan) { pan = unPan }
+	override method valoracion() =  60 + pan.valoracion()
 }
 
-object panIndustrial {
+// Preguntar como hicieron esto del pan
+class PanIndustrial {
 	method valoracion() = 0
 }
 
-object panCasero {
+class PanCasero  {
 	method valoracion() = 20
 }
 
-object panDeMasaMadre {
+class PanMasaMadre {
 	method valoracion() = 45
 }
 
-
-class HamburguesaVegetariana inherits HamburguesaDeCarne {
-	// la legumbre se representa como un String
-	var property legumbre
-	// OJO que el código de inicialización se evalúa
-	// una sola vez, cuando se crea cada objeto.
-	// si cambia la legumbre, cantidadDeLetras queda
-	// refiriéndose a la legumbre "vieja" 
-//	var cantidadDeLetras = legumbre.length() * 2
+class HamburVeg inherits HamburCarne {
+	var legumbre
 	
 	override method esAptoVegetariano() = true
-	override method valoracion() {
-		return super() + 2 * legumbre.size()
-		// puede ser size() o length(), los dos están igual de bien
-	}
+	override method valoracion() = super() + 2*legumbre.size()
 }
 
-// así también estaría bien, pero tiene
-// que estar el método nombre
-// y en el método valoración en HamburguesaVegetariana 
-// va legumbre.nombre().size() 
-object lentejas {
-	method nombre() = "lentejas"
-}
-
-
-class Parrillada inherits Plato {
-	// implementarlo como una lista también es correcto
-	var property cantidadDeCortes
-	const property pesoPorCorte = 250
+class Parrillada inherits Plato{
+	var cantCortesCarne
 	
-	method esAptoVegetariano() = false
-	override method peso() { 
-		return cantidadDeCortes * pesoPorCorte
-	}
-
-	method valoracion() {
-		if (cantidadDeCortes >= 6) {
-			return 140
-		} else if (cantidadDeCortes.between(4,5)) {
-			return 100
-		} else {
-			return 70
-		}
-	}
+	override method peso() = 250*cantCortesCarne
+	override method valoracion() =
+		if (cantCortesCarne < 4) 70
+		else if (cantCortesCarne < 6) 100
+		else 140
 }
-
-
-
-
-
-
-
-

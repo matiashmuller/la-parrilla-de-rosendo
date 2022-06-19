@@ -1,9 +1,94 @@
-import cocina.*
+import platos.*
 import comensales.*
 
-test "testX" {
-
-	const pepe = new Vegetariano()
-	assert.throwsException({cocina.servirUnPlato(pepe)}) 	
-	assert.equals(0, pepe.platosQueComio().size())
+describe "Test platos y comensales" {
+	//Platos
+	const provoleta1 = new Provoleta(peso=260, tieneEspecias = true, esCompleta = false)
+	const provoleta2 = new Provoleta(peso=240, tieneEspecias = false, esCompleta = true)
+	const hamburCarne1 = new HamburCarne(pan=new PanMasaMadre())
+	const hamburVeg1 = new HamburVeg(pan=new PanMasaMadre(), legumbre= "lentejas")
+	const parrillada4C = new Parrillada(cantCortesCarne=4)
+	const parrillada2C = new Parrillada(cantCortesCarne=2)
+	//Personas
+	const matias = new Vegetariano(peso=75000)
+	const marta = new HambrePopular(peso=90000)
+	const leopoldo = new PaladarFino(peso=50000)
+	
+	//Platos
+	test "Provoleta 1" {
+		assert.that(provoleta1.esAbundante())
+		assert.equals(120, provoleta1.valoracion())
+		assert.that(provoleta1.esAptoVegetariano())
+	}
+	
+	test "Provoleta 2" {
+		assert.notThat(provoleta2.esAbundante())
+		// Error en el enunciado (dice 80), si es completa es especial, 120 valoracion ↓
+		assert.equals(120, provoleta2.valoracion())
+		assert.notThat(provoleta2.esAptoVegetariano())
+	}
+	
+	test "Ham Carne 1" {
+		assert.notThat(hamburCarne1.esAbundante())
+		assert.equals(105, hamburCarne1.valoracion())
+		assert.notThat(hamburCarne1.esAptoVegetariano())
+	}
+	
+	test "Ham Veg 1" {
+		assert.notThat(hamburVeg1.esAbundante())
+		assert.equals(121, hamburVeg1.valoracion())
+		assert.that(hamburVeg1.esAptoVegetariano())
+	}
+	
+	test "Parrillada 4" {
+		assert.equals(1000,parrillada4C.peso())
+		assert.that(parrillada4C.esAbundante())
+		assert.equals(100, parrillada4C.valoracion())
+		assert.notThat(parrillada4C.esAptoVegetariano())
+	}
+	
+	test "Parrillada 2" {
+		assert.equals(500,parrillada2C.peso())
+		assert.that(parrillada2C.esAbundante())
+		assert.equals(70, parrillada2C.valoracion())
+		assert.notThat(parrillada2C.esAptoVegetariano())
+	}
+	
+	// Comensales
+	test "Matias" {
+		assert.that(matias.leAgrada(provoleta1))
+		assert.notThat(matias.leAgrada(provoleta2))
+		assert.notThat(matias.leAgrada(hamburCarne1))
+		matias.comer(hamburVeg1)
+		matias.comer(hamburVeg1)
+		matias.comer(hamburVeg1)
+		assert.that(matias.estaSatisfecho())
+		matias.comer(provoleta1)
+		assert.notThat(matias.estaSatisfecho())
+	}
+	
+	test "Marta" {
+		assert.that(marta.leAgrada(parrillada4C))
+		assert.that(marta.leAgrada(parrillada2C))
+		assert.notThat(marta.leAgrada(hamburVeg1))
+		assert.notThat(marta.leAgrada(hamburCarne1))
+		marta.comer(parrillada4C)
+		assert.that(marta.estaSatisfecho())
+	}
+	
+	test "Leopoldo" {
+		assert.that(leopoldo.leAgrada(provoleta1))
+		assert.that(leopoldo.leAgrada(hamburVeg1))
+		assert.that(leopoldo.leAgrada(hamburCarne1))
+		assert.notThat(leopoldo.leAgrada(parrillada4C))
+		assert.notThat(leopoldo.leAgrada(parrillada2C))
+		// Arrastra error de enunciado, dice que no le gusta la provo2 por valoracion <100, pero es 120 ↓
+		assert.that(leopoldo.leAgrada(provoleta2))
+		leopoldo.comer(provoleta1)
+		leopoldo.comer(hamburCarne1)
+		assert.that(leopoldo.estaSatisfecho())
+		leopoldo.comer(hamburVeg1)
+		assert.notThat(leopoldo.estaSatisfecho())
+	}
 }
+
